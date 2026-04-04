@@ -1,9 +1,10 @@
 # Build Stage
 FROM eclipse-temurin:17-jdk-jammy AS builder
 WORKDIR /app
+# Install Maven directly — no reliance on mvnw wrapper script
+RUN apt-get update && apt-get install -y maven && rm -rf /var/lib/apt/lists/*
 COPY . .
-RUN chmod +x mvnw
-RUN ./mvnw clean install -DskipTests
+RUN mvn clean install -DskipTests
 
 # Run Stage (Super Container)
 FROM eclipse-temurin:17-jre-jammy
