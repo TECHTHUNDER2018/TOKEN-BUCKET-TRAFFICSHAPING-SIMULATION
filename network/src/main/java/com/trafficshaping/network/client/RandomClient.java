@@ -13,15 +13,18 @@ public class RandomClient extends TrafficClient {
     public void run() {
         System.out.println("Starting Random Traffic Client...");
         Random random = new Random();
-        try (Socket socket = new Socket(host, port);
-             DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
-            while (true) {
-                sendPacket(out, 100);
-                // Sleep for random between 10ms and 500ms
-                Thread.sleep(10 + random.nextInt(490));
+        while (true) {
+            try (Socket socket = new Socket(host, port);
+                 DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
+                System.out.println("RandomClient connected!");
+                while (true) {
+                    sendPacket(out, 100);
+                    Thread.sleep(10 + random.nextInt(490));
+                }
+            } catch (Exception e) {
+                System.out.println("RandomClient: retrying in 5s... (" + e.getMessage() + ")");
+                try { Thread.sleep(5000); } catch (InterruptedException ignored) {}
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
