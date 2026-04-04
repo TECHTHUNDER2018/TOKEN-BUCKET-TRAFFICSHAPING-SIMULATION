@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Bucket Traffic Shaping Simulator</title>
+    <meta name="description" content="Real-time Visualization of the Token Bucket Algorithm">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard">
+        <header>
+            <h1>Traffic Shaping Simulator</h1>
+            <p>Real-time Token Bucket algorithm visualization</p>
+        </header>
+
+        <main>
+            <div class="stats-panel">
+                <div class="stat-card">
+                    <h3>Available Tokens (TB)</h3>
+                    <p id="tokens-val" class="val neutral">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Token Bucket Passed</h3>
+                    <p id="passed-val" class="val success">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Token Bucket Dropped</h3>
+                    <p id="dropped-val" class="val danger">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Leaky Bucket Passed</h3>
+                    <p id="leaky-passed-val" class="val success">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Leaky Bucket Dropped</h3>
+                    <p id="leaky-dropped-val" class="val danger">0</p>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="trafficChart"></canvas>
+            </div>
+
+            <div class="config-panel">
+                <h2>Dynamic Configuration</h2>
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="capacity-slider">Bucket Capacity (<span id="capacity-display">100</span>)</label>
+                        <input type="range" id="capacity-slider" min="10" max="1000" value="100" step="10">
+                    </div>
+                    <div class="control-group">
+                        <label for="refill-slider">Refill Rate (Tokens/sec) (<span id="refill-display">50</span>)</label>
+                        <input type="range" id="refill-slider" min="5" max="500" value="50" step="5">
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

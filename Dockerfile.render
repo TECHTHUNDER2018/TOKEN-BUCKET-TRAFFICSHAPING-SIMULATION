@@ -1,0 +1,26 @@
+# Build Stage
+FROM eclipse-temurin:17-jdk-jammy AS builder
+WORKDIR /app
+COPY . .
+RUN chmod +x mvnw
+RUN ./mvnw clean install -DskipTests
+
+# Run Stage (Super Container)
+FROM eclipse-temurin:17-jre-jammy
+WORKDIR /app
+
+# Copy the server executable jar
+COPY --from=builder /app/web/target/web-1.0-SNAPSHOT.jar app.jar
+
+# Copy the un-packaged client classes 
+COPY --from=builder /app/core/target/classes /app/core-classes
+COPY --from=builder /app/network/target/classes /app/network-classes
+
+# Copy the orchestration script
+COPY render-start.sh .
+RUN chmod +x render-start.sh
+
+# Expose ONLY the Web Server port for Render
+EXPOSE 8080
+
+CMD ["./render-start.sh"]

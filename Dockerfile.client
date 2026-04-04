@@ -1,0 +1,19 @@
+FROM eclipse-temurin:17-jdk-jammy AS builder
+WORKDIR /app
+COPY . .
+RUN ./mvnw clean install -DskipTests
+
+FROM eclipse-temurin:17-jre-jammy
+WORKDIR /app
+COPY --from=builder /app/network/target/network-1.0-SNAPSHOT.jar network.jar
+
+# We need the core jar as a dependency since network module uses it, 
+# but simply running the compiled classes via classpath is easier
+COPY --from=builder /app/core/target/classes /app/core-classes
+COPY --from=builder /app/network/target/classes /app/network-classes
+
+ENV CLIENT_TYPE=SteadyClient
+ENV SERVER_HOST=server
+ENV SERVER_PORT=9000
+
+CMD java -cp /app/core-classes:/app/network-classes com.trafficshaping.network.client.${CLIENT_TYPE}

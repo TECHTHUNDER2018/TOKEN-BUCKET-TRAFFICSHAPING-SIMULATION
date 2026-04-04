@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    ports:
+      - "8080:8080"
+      - "9000:9000"
+    networks:
+      - sim-network
+
+  steady-client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    environment:
+      - CLIENT_TYPE=SteadyClient
+    depends_on:
+      - server
+    networks:
+      - sim-network
+
+  bursty-client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    environment:
+      - CLIENT_TYPE=BurstyClient
+    depends_on:
+      - server
+    networks:
+      - sim-network
+
+  random-client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    environment:
+      - CLIENT_TYPE=RandomClient
+    depends_on:
+      - server
+    networks:
+      - sim-network
+
+networks:
+  sim-network:
+    driver: bridge
