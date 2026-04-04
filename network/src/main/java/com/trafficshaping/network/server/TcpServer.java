@@ -56,25 +56,14 @@ public class TcpServer {
     private void handleClient(Socket socket) {
         try (DataInputStream in = new DataInputStream(socket.getInputStream())) {
             System.out.println("Client connected: " + socket.getRemoteSocketAddress());
+            long packetsProcessed = 0;
             while (running) {
                 String packetId = in.readUTF();
                 int size = in.readInt();
                 Packet packet = new Packet(packetId, size);
-                
-                boolean tbPassed = tokenBucket.processPacket(packet);
-                boolean lbPassed = leakyBucket.processPacket(packet);
-                
-                if (tbPassed) {
-                    System.out.println("TokenBucket Forwarded: " + packetId);
-                } else {
-                    System.out.println("TokenBucket Dropped: " + packetId);
-                }
-                
-                if (lbPassed) {
-                    System.out.println("LeakyBucket Forwarded: " + packetId);
-                } else {
-                    System.out.println("LeakyBucket Dropped: " + packetId);
-                }
+                tokenBucket.processPacket(packet);
+                leakyBucket.processPacket(packet);
+                packetsProcessed++;
             }
         } catch (IOException e) {
             System.out.println("Client disconnected or error: " + socket.getRemoteSocketAddress());
