@@ -152,8 +152,41 @@ function initControls() {
         });
 }
 
+function spawnClients(type) {
+    const countInput = document.getElementById(`${type}-count`);
+    const count = countInput ? countInput.value : 1;
+    
+    fetch(`/api/clients/spawn/${type}?count=${count}`, {
+        method: 'POST'
+    }).then(() => {
+        pollClientCount(); // Update count immediately
+    }).catch(err => console.error("Error spawning clients:", err));
+}
+
+function stopAllClients() {
+    fetch('/api/clients/stop', {
+        method: 'POST'
+    }).then(() => {
+        pollClientCount();
+    }).catch(err => console.error("Error stopping clients:", err));
+}
+
+function pollClientCount() {
+    fetch('/api/clients/count')
+        .then(res => res.json())
+        .then(count => {
+            const display = document.getElementById('active-clients-count');
+            if (display) {
+                display.innerText = count;
+            }
+        }).catch(err => console.error("Error fetching client count:", err));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initChart();
     initControls();
     connectWebSocket();
+    pollClientCount();
+    // Poll client count every 5 seconds to ensure accuracy
+    setInterval(pollClientCount, 5000);
 });

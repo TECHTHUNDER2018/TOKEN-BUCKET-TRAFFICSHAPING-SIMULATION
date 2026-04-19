@@ -3,7 +3,7 @@ package com.trafficshaping.network.client;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public abstract class TrafficClient {
+public abstract class TrafficClient implements Runnable {
     protected final String host;
     protected final int port;
 

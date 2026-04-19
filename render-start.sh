@@ -17,17 +17,11 @@ if ! kill -0 $SERVER_PID 2>/dev/null; then
   exit 1
 fi
 
-echo "Routing Internal Traffic Generators to localhost:9000..."
-
 export SERVER_HOST=localhost
 export SERVER_PORT=9000
 
-# Start clients in the background
-java -cp "/app/core-classes:/app/network-classes" com.trafficshaping.network.client.SteadyClient &
-java -cp "/app/core-classes:/app/network-classes" com.trafficshaping.network.client.BurstyClient &
-java -cp "/app/core-classes:/app/network-classes" com.trafficshaping.network.client.RandomClient &
-
-echo "All components launched! Dashboard running on port ${PORT:-8080}"
+echo "Server successfully booted. Clients will be managed automatically by the internal Spring Boot Service."
+echo "Dashboard running on port ${PORT:-8080}"
 
 # Wait for the server process specifically — keep the container alive as long as it runs
 wait $SERVER_PID

@@ -11,19 +11,28 @@ public class SteadyClient extends TrafficClient {
     @Override
     public void run() {
         System.out.println("Starting Steady Traffic Client...");
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             try (Socket socket = new Socket(host, port);
                  DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
                 System.out.println("SteadyClient connected!");
-                while (true) {
+                while (!Thread.currentThread().isInterrupted()) {
                     sendPacket(out, 100);
                     Thread.sleep(50); // Steady 20 packets per second
                 }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); // Restore interrupted status
+                break;
             } catch (Exception e) {
-                System.out.println("SteadyClient: connection lost, retrying in 5s... (" + e.getMessage() + ")");
-                try { Thread.sleep(5000); } catch (InterruptedException ignored) {}
+                if (!Thread.currentThread().isInterrupted()) {
+                    System.out.println("SteadyClient: connection lost, retrying in 5s... (" + e.getMessage() + ")");
+                    try { Thread.sleep(5000); } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
             }
         }
+        System.out.println("SteadyClient stopped.");
     }
 
     public static void main(String[] args) {

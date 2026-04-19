@@ -56,6 +56,37 @@
                     </div>
                 </div>
             </div>
+
+            <div class="orchestration-panel">
+                <h2>Traffic Generators Control (<span id="active-clients-count">0</span> Active Threads)</h2>
+                <p>Spawn active backend Java threads to flood the simulator with live packet logic.</p>
+                
+                <div class="client-controls">
+                    <div class="client-type">Steady</div>
+                    <div class="client-actions">
+                        <input type="number" id="steady-count" min="1" max="10" value="1">
+                        <button class="btn btn-primary" onclick="spawnClients('steady')">Spawn</button>
+                    </div>
+                </div>
+
+                <div class="client-controls">
+                    <div class="client-type">Bursty</div>
+                    <div class="client-actions">
+                        <input type="number" id="bursty-count" min="1" max="10" value="1">
+                        <button class="btn btn-primary" onclick="spawnClients('bursty')">Spawn</button>
+                    </div>
+                </div>
+
+                <div class="client-controls">
+                    <div class="client-type">Random</div>
+                    <div class="client-actions">
+                        <input type="number" id="random-count" min="1" max="10" value="1">
+                        <button class="btn btn-primary" onclick="spawnClients('random')">Spawn</button>
+                    </div>
+                </div>
+
+                <button class="btn btn-danger stop-all" onclick="stopAllClients()">Stop All Traffic Generators</button>
+            </div>
         </main>
     </div>
 

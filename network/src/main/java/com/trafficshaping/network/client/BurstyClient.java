@@ -11,23 +11,33 @@ public class BurstyClient extends TrafficClient {
     @Override
     public void run() {
         System.out.println("Starting Bursty Traffic Client...");
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             try (Socket socket = new Socket(host, port);
                  DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
                 System.out.println("BurstyClient connected!");
-                while (true) {
+                while (!Thread.currentThread().isInterrupted()) {
                     System.out.println("Sleeping for 2 seconds...");
                     Thread.sleep(2000);
                     System.out.println("Sending burst of 50 packets!");
                     for (int i = 0; i < 50; i++) {
+                        if (Thread.currentThread().isInterrupted()) break;
                         sendPacket(out, 100);
                     }
                 }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
             } catch (Exception e) {
-                System.out.println("BurstyClient: retrying in 5s... (" + e.getMessage() + ")");
-                try { Thread.sleep(5000); } catch (InterruptedException ignored) {}
+                if (!Thread.currentThread().isInterrupted()) {
+                    System.out.println("BurstyClient: retrying in 5s... (" + e.getMessage() + ")");
+                    try { Thread.sleep(5000); } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
             }
         }
+        System.out.println("BurstyClient stopped.");
     }
 
     public static void main(String[] args) {
