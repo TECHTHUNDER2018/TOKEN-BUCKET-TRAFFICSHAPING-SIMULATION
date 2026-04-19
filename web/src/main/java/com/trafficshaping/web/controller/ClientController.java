@@ -19,7 +19,7 @@ public class ClientController {
     }
 
     @PostMapping("/spawn/{type}")
-    public void spawnClients(@PathVariable String type, @RequestParam(defaultValue = "1") int count) {
+    public void spawnClients(@PathVariable("type") String type, @RequestParam(name = "count", defaultValue = "1") int count) {
         clientManager.spawnClients(type, count);
     }
 
