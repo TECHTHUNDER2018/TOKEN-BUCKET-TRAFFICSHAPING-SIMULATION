@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Token Bucket Traffic Shaping Simulator</title>
     <meta name="description" content="Real-time Visualization of the Token Bucket Algorithm">
+    <link rel="icon" href="data:,">
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -41,6 +42,17 @@
 
             <div class="chart-container">
                 <canvas id="trafficChart"></canvas>
+            </div>
+
+            <div class="info-panel">
+                <h2>How Real-Time Plotting Works</h2>
+                <div class="info-content">
+                    <p><strong>1. WebSocket Connection:</strong> The dashboard establishes a persistent, real-time WebSocket connection to the server (`ws://.../telemetry`). <span id="ws-status" style="color: var(--accent-success); font-family: monospace;">[Waiting...]</span></p>
+                    <p><strong>2. Server-Side Broadcasting:</strong> Every second, the backend reads the current state of the Token Bucket and Leaky Bucket algorithms (Passed/Dropped metrics) and broadcasts a JSON frame to the browser.</p>
+                    <div id="ws-log-box" class="log-box">Waiting for telemetry data...</div>
+                    <p><strong>3. Client-Side Rendering:</strong> Upon receiving the WebSocket message, Javascript updates the stat counters and pushes the new timestamped data points onto the <strong>Chart.js</strong> line graphs. <span id="ws-data-points" style="color: var(--accent-primary); font-family: monospace;">[Data points rendered: 0]</span></p>
+                    <p><strong>4. Sliding Window:</strong> To maintain performance and visual clarity, the chart enforces a "sliding window" of the most recent 60 seconds of data. As new dots are pushed to the right, the oldest dots are dropped from the left. <span id="ws-sliding-window" style="color: var(--accent-danger); font-family: monospace;"></span></p>
+                </div>
             </div>
 
             <div class="config-panel">

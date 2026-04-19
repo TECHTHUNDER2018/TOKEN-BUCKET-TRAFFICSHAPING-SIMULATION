@@ -78,12 +78,47 @@ function connectWebSocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const ws = new WebSocket(`${protocol}//${window.location.host}/telemetry`);
     
+    ws.onopen = () => {
+        const statusSpan = document.getElementById('ws-status');
+        if (statusSpan) {
+            statusSpan.innerText = "[Connected]";
+            statusSpan.style.color = "var(--accent-success)";
+        }
+    };
+
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
+        const logBox = document.getElementById('ws-log-box');
+        if (logBox) {
+            if (logBox.innerText === "Waiting for telemetry data...") {
+                logBox.innerHTML = "";
+            }
+            const entry = document.createElement('div');
+            entry.className = "log-entry";
+            entry.innerHTML = `
+                <span style="color: #64748b;">[${data.timestamp}]</span> 
+                <span style="color: #8b5cf6;">sys@127.0.0.1</span> 
+                <span style="color: #94a3b8;">=> TB(</span><span style="color: #10b981;">Passed:${data.passed}</span><span style="color: #64748b;">, </span><span style="color: #ef4444;">Dropped:${data.dropped}</span><span style="color: #64748b;">, </span><span style="color: var(--accent-primary);">Tokens:${data.bucketLevel}</span><span style="color: #94a3b8;">)</span> 
+                <span style="color: #64748b;">||</span> 
+                <span style="color: #94a3b8;">LB(</span><span style="color: #3b82f6;">Passed:${data.leakyPassed}</span><span style="color: #64748b;">, </span><span style="color: #f59e0b;">Dropped:${data.leakyDropped}</span><span style="color: #94a3b8;">)</span>
+            `;
+            logBox.appendChild(entry);
+            
+            while (logBox.children.length > 15) {
+                logBox.removeChild(logBox.firstChild);
+            }
+            
+            logBox.scrollTop = logBox.scrollHeight;
+        }
         updateDashboard(data);
     };
 
     ws.onclose = () => {
+        const statusSpan = document.getElementById('ws-status');
+        if (statusSpan) {
+            statusSpan.innerText = "[Disconnected - Reconnecting...]";
+            statusSpan.style.color = "var(--accent-danger)";
+        }
         console.log('WebSocket disconnected. Attempting to reconnect...');
         setTimeout(connectWebSocket, 1000);
     };
@@ -102,12 +137,23 @@ function updateDashboard(data) {
     chart.data.datasets[2].data.push(data.leakyPassed);
     chart.data.datasets[3].data.push(data.leakyDropped);
 
+    const dataPointsSpan = document.getElementById('ws-data-points');
+    if (dataPointsSpan) {
+        dataPointsSpan.innerText = `[Data points: ${chart.data.labels.length}]`;
+    }
+
     if (chart.data.labels.length > maxDataPoints) {
         chart.data.labels.shift();
         chart.data.datasets[0].data.shift();
         chart.data.datasets[1].data.shift();
         chart.data.datasets[2].data.shift();
         chart.data.datasets[3].data.shift();
+        
+        const slideSpan = document.getElementById('ws-sliding-window');
+        if (slideSpan) {
+            slideSpan.innerText = "[Dropped oldest dot]";
+            setTimeout(() => { slideSpan.innerText = ""; }, 500);
+        }
     }
 
     chart.update();

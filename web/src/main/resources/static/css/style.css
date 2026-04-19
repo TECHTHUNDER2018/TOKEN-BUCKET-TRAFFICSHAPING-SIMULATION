@@ -97,7 +97,57 @@ header p {
     background-color: var(--panel-bg);
     border-radius: 1rem;
     padding: 1.5rem;
+    margin-bottom: 2rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.info-panel {
+    background-color: var(--panel-bg);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.info-panel h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.info-content p {
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.info-content strong {
+    color: var(--accent-primary);
+}
+
+.log-box {
+    background-color: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+    height: 120px;
+    overflow-y: auto;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.8rem;
+    color: var(--accent-primary);
+}
+
+.log-entry {
+    margin-bottom: 0.25rem;
+    border-bottom: 1px dashed rgba(59, 130, 246, 0.2);
+    padding-bottom: 0.25rem;
+}
+
+.log-entry:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
 }
 
 .config-panel h2 {
