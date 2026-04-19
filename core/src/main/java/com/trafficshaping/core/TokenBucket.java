@@ -18,17 +18,27 @@ public class TokenBucket {
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
+    private double fractionalTokens = 0;
+
     public void start() {
-        // Refill loop: add refillRate tokens every 1 second, but done continuously over 100ms intervals (10x a second)
+        // Refill loop: add refillRate tokens every 1 second, but done continuously over 100ms intervals (10.0x a second)
         scheduler.scheduleAtFixedRate(() -> {
-            int toAdd = Math.max(1, config.getRefillRate() / 10);
+            // Calculate float tokens to add this tick and preserve fractions to prevent integer drop-offs
+            double toAddDouble = config.getRefillRate() / 10.0;
+            fractionalTokens += toAddDouble;
+            
+            int toAdd = (int) fractionalTokens;
+            fractionalTokens -= toAdd;
+            
             int capacity = config.getBucketCapacity();
             
-            int current, next;
-            do {
-                current = currentTokens.get();
-                next = Math.min(capacity, current + toAdd);
-            } while (current != next && !currentTokens.compareAndSet(current, next));
+            if (toAdd > 0) {
+                int current, next;
+                do {
+                    current = currentTokens.get();
+                    next = Math.min(capacity, current + toAdd);
+                } while (current != next && !currentTokens.compareAndSet(current, next));
+            }
         }, 0, 100, TimeUnit.MILLISECONDS);
     }
 

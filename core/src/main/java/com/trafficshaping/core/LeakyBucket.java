@@ -18,19 +18,31 @@ public class LeakyBucket {
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
+    private double fractionalLeak = 0;
+
     public void start() {
-        // Run frequently to check if we need to leak based on rate
+        // Run constantly over 100ms intervals (10.0x a second), dynamically adapting to refillRate
         scheduler.scheduleAtFixedRate(() -> {
-            int current;
-            do {
-                current = currentQueue.get();
-                if (current <= 0) break;
-            } while (!currentQueue.compareAndSet(current, current - 1));
+            double toLeakDouble = config.getRefillRate() / 10.0;
+            fractionalLeak += toLeakDouble;
             
-            if (current > 0) {
-                metrics.incrementLeakyPassed(); 
+            int toLeak = (int) fractionalLeak;
+            fractionalLeak -= toLeak;
+            
+            for (int i = 0; i < toLeak; i++) {
+                int current;
+                do {
+                    current = currentQueue.get();
+                    if (current <= 0) break;
+                } while (!currentQueue.compareAndSet(current, current - 1));
+                
+                if (current > 0) {
+                    metrics.incrementLeakyPassed(); 
+                } else {
+                    break;
+                }
             }
-        }, 0, Math.max(10, 1000 / Math.max(1, config.getRefillRate())), TimeUnit.MILLISECONDS);
+        }, 0, 100, TimeUnit.MILLISECONDS);
     }
 
     public void stop() {
